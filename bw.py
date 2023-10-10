@@ -146,6 +146,9 @@ async def process_sites(
             asyncio.create_task(get_response(session, site, remove_comments))
         )
 
+    if not tasks:
+        return None
+
     failed_websites_count = 0
     checked_websites_count = 0
     regex_match_count = 0
