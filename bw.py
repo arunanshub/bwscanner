@@ -7,7 +7,6 @@ import re
 import urllib.parse
 from dataclasses import dataclass
 from http import HTTPStatus
-from urllib.parse import quote, urljoin
 
 import aiohttp
 from lxml import html
@@ -198,7 +197,7 @@ async def main() -> None:
 
     bwtech: str = args.bwtech
     bwtech = bwtech.replace("/", " ")
-    bwsite = urljoin(BUILTWITH_SITE, quote(bwtech))
+    bwsite = urllib.parse.urljoin(BUILTWITH_SITE, urllib.parse.quote(bwtech))
     print(bwsite)
 
     async with aiohttp.ClientSession(
