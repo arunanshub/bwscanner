@@ -7,7 +7,7 @@ import re
 import urllib.parse
 from dataclasses import dataclass
 from http import HTTPStatus
-from urllib.parse import quote, urljoin, urlunsplit
+from urllib.parse import quote, urljoin
 
 import aiohttp
 from lxml import html
@@ -64,33 +64,39 @@ async def get_response(
     return None
 
 
-def get_cleaned_url(url_without_scheme: str) -> str:
+def get_normalized_url(url: str) -> str:
     """
-    TODO: Give a better name to this function.
+    Takes a url of form `//site.com` or `site.com` and converts it to `https://site.com`.
     """
-    return urlunsplit(("https", url_without_scheme, "", "", ""))
-
-
-def clean_link(input_link: str) -> str:
-    parsed_url = urllib.parse.urlparse(input_link)
-    if not parsed_url.scheme:
-        parsed_url = parsed_url._replace(scheme="https")
-    return urllib.parse.urlunparse(parsed_url)
+    parsed_url = urllib.parse.urlparse(url, "https")
+    normalized_url = parsed_url
+    if not parsed_url.netloc and parsed_url.path:
+        normalized_url = parsed_url._replace(netloc=parsed_url.path, path="")
+    return urllib.parse.urlunparse(normalized_url)
 
 
 def get_builtwith_websites(source: str) -> list[str]:
+    """
+    Parse the "Uses" page of BuiltWith and list the websites that uses a
+    particular technology.
+    """
     urls = html.fromstring(source).xpath(
         r".//tr[@data-domain]/td[@class='pl-0 text-primary']/text()"
     )
     assert isinstance(urls, list)
-    return list(map(get_cleaned_url, urls))  # type: ignore
+    return list(map(get_normalized_url, urls))  # type: ignore
 
 
 def is_regex_matching(data: str, regex: re.Pattern[str]) -> bool:
+    """Check if regex matches or not."""
     return regex.search(data) is not None
 
 
 def get_builtwith_technology_link(source: str) -> str | None:
+    """
+    Parse the BuiltWith "Uses" page and get the link to the BuiltWith
+    "Technology Overview" page.
+    """
     tree = html.fromstring(source)
     technology_link_arr = tree.xpath(
         r".//nav[@aria-label='breadcrumb']/ol/li/a/@href[contains(., '//trends')]"  # noqa: E501
@@ -98,13 +104,16 @@ def get_builtwith_technology_link(source: str) -> str | None:
     assert isinstance(technology_link_arr, list)
     if not len(technology_link_arr):
         return None
-    return clean_link(technology_link_arr[0])  # type: ignore
+    return get_normalized_url(technology_link_arr[0])  # type: ignore
 
 
-async def get_builtwith_technology_description(
+async def get_builtwith_technology_details(
     session: aiohttp.ClientSession,
     technology_site: str,
 ) -> TechnologyDetails | None:
+    """
+    Get the technology details from the BuiltWith "Technology Details" page.
+    """
     site_data = await get_response(session, technology_site)
     if site_data is None:
         return None
@@ -200,10 +209,10 @@ async def main() -> None:
         if bwsite_resp is None:
             return
 
-        # then print the details
+        # print the details about the Technology
         bw_techsite = get_builtwith_technology_link(bwsite_resp.text)
         if bw_techsite is not None:
-            tech_details = await get_builtwith_technology_description(
+            tech_details = await get_builtwith_technology_details(
                 session, bw_techsite
             )
             if tech_details is not None:
@@ -214,7 +223,7 @@ async def main() -> None:
         pattern = input("regex: ")
         regex = re.compile(
             pattern,
-            re.MULTILINE | args.ignorecase & re.IGNORECASE,
+            re.MULTILINE | (re.IGNORECASE if args.ignorecase else re.NOFLAG),
         )
 
         stats = await process_sites(
