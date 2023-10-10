@@ -1,0 +1,72 @@
+[tool.poetry]
+name = "bypass-bot-detection"
+version = "0.1.0"
+description = ""
+authors = ["Arunanshu Biswas <mydellpc07@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+lxml = "^4.9.3"
+aiohttp = "^3.8.5"
+brotli = "^1.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+lxml-stubs = "^0.4.0"
+hypothesis = "^6.87.3"
+pytest = "^7.4.2"
+pytest-xdist = "^3.3.1"
+mypy = "^1.5.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# checkers
+[tool.black]
+line-length = 79
+target-verson = "py38"
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING",
+  "if typing.TYPE_CHECKING",
+]
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers"
+
+[tool.ruff]
+line-length = 79
+target-version = "py38"
+exclude = [
+  "docs",
+  "tests",
+]
+ignore = ["ANN101", "ANN102", "ANN401", "B024", "PLR0913"]
+select = [
+  "ANN",
+  "B",
+  "E",
+  "F",
+  "W",
+  "I",
+  "RET",
+  "EM",
+  "UP",
+  "C90",
+  "PTH",
+  "SIM",
+  "TCH",
+  "PIE",
+  "TID",
+  "G",
+  "PL",
+]
+
+[tool.ruff.isort]
+required-imports = ["from __future__ import annotations"]
+combine-as-imports = true
+force-wrap-aliases = true
