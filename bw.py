@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import re
+import typing
 import urllib.parse
 from dataclasses import dataclass
 from http import HTTPStatus
@@ -43,15 +44,21 @@ class TechnologyDetails:
     description: str
     site: str
     tags: str
+    image_link: str
 
 
 async def get_response(
     session: aiohttp.ClientSession,
     site: str,
     remove_comments: bool = False,
+    allow_redirects: bool = True,
 ) -> SiteInfo | None:
     try:
-        async with session.get(site, headers=HEADERS_BYPASS_BLOCK) as response:
+        async with session.get(
+            site,
+            headers=HEADERS_BYPASS_BLOCK,
+            allow_redirects=allow_redirects,
+        ) as response:
             if response.status != HTTPStatus.OK:
                 return None
             html_source = await response.text(errors="replace")
@@ -74,7 +81,7 @@ def get_normalized_url(url: str) -> str:
     return urllib.parse.urlunparse(normalized_url)
 
 
-def get_builtwith_websites(source: str) -> list[str]:
+def get_builtwith_client_websites(source: str) -> list[str]:
     """
     Parse the "Uses" page of BuiltWith and list the websites that uses a
     particular technology.
@@ -123,13 +130,20 @@ async def get_builtwith_technology_details(
     if len(p_elements) != 3:  # noqa: PLR2004
         return None
 
+    # get image link
+    image_el = tree.xpath(
+        r".//div[@class='col-md-2 col-3 text-center']/img/@data-src"
+    )
+    assert isinstance(image_el, list)
+    image_link = typing.cast(str, image_el.pop())
+
     # TODO: the type errors are too complex to solve. Python tries to be
     #  TypeScript without giving TypeScript's benefits.
     p_description, p_techsite, p_tags = p_elements
     description = p_description.text  # type: ignore
     technology_site = p_techsite.xpath(r".//a/text()")[0]  # type: ignore
     tags = p_tags.xpath(r".//a/text()")  # type: ignore
-    return TechnologyDetails(description, technology_site, tags)  # type: ignore
+    return TechnologyDetails(description, technology_site, tags, image_link)  # type: ignore
 
 
 async def process_sites(
@@ -140,7 +154,7 @@ async def process_sites(
 ) -> Stats | None:
     # start the response fetch early on
     tasks = []
-    for site in get_builtwith_websites(bwsite_source):
+    for site in get_builtwith_client_websites(bwsite_source):
         tasks.append(
             asyncio.create_task(get_response(session, site, remove_comments))
         )
@@ -170,7 +184,10 @@ async def process_sites(
 
 
 async def main() -> None:
-    parser = argparse.ArgumentParser(description="Process builtwith websites.")
+    parser = argparse.ArgumentParser(
+        description="Process builtwith websites.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument("bwtech", help="The builtwith tech.")
     parser.add_argument(
         "-n",
@@ -207,7 +224,11 @@ async def main() -> None:
             sock_read=args.timeout,
         )
     ) as session:
-        bwsite_resp = await get_response(session, bwsite)
+        bwsite_resp = await get_response(
+            session,
+            bwsite,
+            allow_redirects=False,
+        )
         if bwsite_resp is None:
             return
 
@@ -220,7 +241,13 @@ async def main() -> None:
             if tech_details is not None:
                 print("Techsite:", tech_details.site)
                 print("Description:", tech_details.description)
-                print("Tags:", ", ".join(tech_details.tags), "\n")
+                print("Tags:", ", ".join(tech_details.tags))
+                print("Image link:", tech_details.image_link)
+                print(
+                    "Is image blank:",
+                    "blank" in tech_details.image_link.rsplit("/", 1)[-1],
+                    "\n",
+                )
 
         pattern = input("regex: ")
         regex = re.compile(
