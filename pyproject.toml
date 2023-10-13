@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "bwscan"
+name = "bwscanner"
 version = "0.1.0"
 description = "Scan BuiltWith for technologies that match a given regex."
 authors = ["Arunanshu Biswas <mydellpc07@gmail.com>"]
 readme = "README.md"
 repository = "https://github.com/arunanshub/bwscan"
 license = "GPL-3.0-only"
-scripts = { bwscan = "bwscan.__main__:main" }
+scripts = { bwscanner = "bwscanner.__main__:main" }
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/arunanshub/bwscan/issues"
