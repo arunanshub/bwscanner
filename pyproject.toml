@@ -4,6 +4,13 @@ version = "0.1.0"
 description = "Scan BuiltWith for technologies that match a given regex."
 authors = ["Arunanshu Biswas <mydellpc07@gmail.com>"]
 readme = "README.md"
+repository = "https://github.com/arunanshub/sphinx-nested-apidoc"
+license = "GPL-3.0-only"
+scripts = { bwscan = "bwscan.__main__:main" }
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/arunanshub/bwscan/issues"
+"Changelog" = "https://github.com/arunanshub/bwscan/blob/master/CHANGELOG.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -13,7 +20,7 @@ brotli = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 lxml-stubs = "^0.4.0"
-hypothesis = {extras = ["cli", "codemods"], version = "^6.87.4"}
+hypothesis = { extras = ["cli", "codemods"], version = "^6.87.4" }
 pytest = "^7.4.2"
 pytest-xdist = "^3.3.1"
 mypy = "^1.5.1"
@@ -41,9 +48,7 @@ addopts = "--strict-config --strict-markers"
 [tool.ruff]
 line-length = 79
 target-version = "py38"
-exclude = [
-  "docs",
-]
+exclude = ["docs"]
 ignore = ["ANN101", "ANN102", "ANN401", "B024", "PLR0913"]
 select = [
   "ANN",
