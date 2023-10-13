@@ -183,7 +183,7 @@ async def process_sites(
     )
 
 
-async def main() -> None:
+async def _main() -> None:
     parser = argparse.ArgumentParser(
         description="Process builtwith websites.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -269,5 +269,5 @@ async def main() -> None:
         print(f"Total checked {stats.checked + stats.failed} websites")
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+def main() -> None:
+    asyncio.run(_main())
