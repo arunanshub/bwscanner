@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "bypass-bot-detection"
+name = "bwscan"
 version = "0.1.0"
-description = ""
+description = "Scan BuiltWith for technologies that match a given regex."
 authors = ["Arunanshu Biswas <mydellpc07@gmail.com>"]
 readme = "README.md"
 
@@ -11,13 +11,13 @@ lxml = "^4.9.3"
 aiohttp = "^3.8.5"
 brotli = "^1.1.0"
 
-
 [tool.poetry.group.dev.dependencies]
 lxml-stubs = "^0.4.0"
-hypothesis = "^6.87.3"
+hypothesis = {extras = ["cli", "codemods"], version = "^6.87.4"}
 pytest = "^7.4.2"
 pytest-xdist = "^3.3.1"
 mypy = "^1.5.1"
+ruff = "^0.0.292"
 
 [build-system]
 requires = ["poetry-core"]
@@ -43,7 +43,6 @@ line-length = 79
 target-version = "py38"
 exclude = [
   "docs",
-  "tests",
 ]
 ignore = ["ANN101", "ANN102", "ANN401", "B024", "PLR0913"]
 select = [
@@ -69,4 +68,3 @@ select = [
 [tool.ruff.isort]
 required-imports = ["from __future__ import annotations"]
 combine-as-imports = true
-force-wrap-aliases = true
