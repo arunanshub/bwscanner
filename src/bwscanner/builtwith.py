@@ -25,10 +25,10 @@ def get_client_websites(source: str) -> list[str]:
     particular technology.
     """
     urls = html.fromstring(source).xpath(
-        r".//tr[@data-domain]/td[@class='pl-0 text-primary']/text()"
+        r".//tr[@data-domain]/td[@class='pl-0 text-primary']/text()",
     )
-    assert isinstance(urls, list)
-    return list(map(utils.get_normalized_url, urls))  # type: ignore
+    assert isinstance(urls, list)  # noqa: S101
+    return list(map(utils.get_normalized_url, urls))  # type: ignore[arg-type]
 
 
 def get_technology_link(source: str) -> str | None:
@@ -38,12 +38,12 @@ def get_technology_link(source: str) -> str | None:
     """
     tree = html.fromstring(source)
     technology_link_arr = tree.xpath(
-        r".//nav[@aria-label='breadcrumb']/ol/li/a/@href[contains(., '//trends')]"  # noqa: E501
+        r".//nav[@aria-label='breadcrumb']/ol/li/a/@href[contains(., '//trends')]",
     )
-    assert isinstance(technology_link_arr, list)
+    assert isinstance(technology_link_arr, list)  # noqa: S101
     if not len(technology_link_arr):
         return None
-    return utils.get_normalized_url(technology_link_arr[0])  # type: ignore
+    return utils.get_normalized_url(technology_link_arr[0])  # type: ignore[arg-type]
 
 
 async def get_technology_details(
@@ -59,21 +59,21 @@ async def get_technology_details(
 
     tree = html.fromstring(site_data.text)
     p_elements = tree.xpath(r".//div/*/div[@class='col-9 col-md-10']/p")
-    assert isinstance(p_elements, list)
+    assert isinstance(p_elements, list)  # noqa: S101
     if len(p_elements) != 3:  # noqa: PLR2004
         return None
 
     # get image link
     image_el = tree.xpath(
-        r".//div[@class='col-md-2 col-3 text-center']/img/@data-src"
+        r".//div[@class='col-md-2 col-3 text-center']/img/@data-src",
     )
-    assert isinstance(image_el, list)
+    assert isinstance(image_el, list)  # noqa: S101
     image_link = typing.cast(str, image_el.pop())
 
     # TODO: the type errors are too complex to solve. Python tries to be
     #  TypeScript without giving TypeScript's benefits.
     p_description, p_techsite, p_tags = p_elements
-    description = p_description.text  # type: ignore
-    technology_site = p_techsite.xpath(r".//a/text()")[0]  # type: ignore
-    tags = p_tags.xpath(r".//a/text()")  # type: ignore
-    return TechnologyDetails(description, technology_site, tags, image_link)  # type: ignore
+    description = p_description.text  # type: ignore[union-attr]
+    technology_site = p_techsite.xpath(r".//a/text()")[0]  # type: ignore[union-attr,index,assignment]
+    tags = p_tags.xpath(r".//a/text()")  # type: ignore[union-attr]
+    return TechnologyDetails(description, technology_site, tags, image_link)  # type: ignore[arg-type]

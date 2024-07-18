@@ -23,15 +23,16 @@ async def process_sites(
     session: aiohttp.ClientSession,
     bwsite_source: str,
     regex: re.Pattern[str],
-    remove_comments: bool,
+    *,
+    remove_comments: bool = False,
 ) -> Stats | None:
     # start the response fetch early on
     tasks = []
     for site in builtwith.get_client_websites(bwsite_source):
-        tasks.append(
+        tasks.append(  # noqa: PERF401
             asyncio.create_task(
-                net.get_response(session, site, remove_comments)
-            )
+                net.get_response(session, site, remove_comments=remove_comments),
+            ),
         )
 
     if not tasks:

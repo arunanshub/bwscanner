@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import re
 
-from hypothesis import provisional, strategies as st
+from hypothesis import provisional
+from hypothesis import strategies as st
 
 REGEX_REMOVE_SLASHES_AND_SCHEME = re.compile(r"^\S+?:\/\/")
 REGEX_REMOVE_SCHEME = re.compile(r"^\S+?:")

@@ -1,4 +1,3 @@
-#! /bin/env python3
 from __future__ import annotations
 
 import argparse
@@ -52,7 +51,7 @@ async def _main() -> None:
             total=None,
             sock_connect=args.timeout,
             sock_read=args.timeout,
-        )
+        ),
     ) as session:
         bwsite_resp = await net.get_response(
             session,
@@ -66,7 +65,8 @@ async def _main() -> None:
         bw_techsite = builtwith.get_technology_link(bwsite_resp.text)
         if bw_techsite is not None:
             tech_details = await builtwith.get_technology_details(
-                session, bw_techsite
+                session,
+                bw_techsite,
             )
             if tech_details is not None:
                 print("Techsite:", tech_details.site)
@@ -89,7 +89,7 @@ async def _main() -> None:
             session,
             bwsite_resp.text,
             regex,
-            args.no_remove_comments,
+            remove_comments=args.no_remove_comments,
         )
 
     if stats is not None:

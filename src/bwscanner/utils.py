@@ -8,9 +8,7 @@ if TYPE_CHECKING:
 
 
 def get_normalized_url(url: str) -> str:
-    """
-    Takes a url of form `//site.com` or `site.com` and converts it to `https://site.com`.
-    """
+    """Takes a url of form `//site.com` or `site.com` and converts it to `https://site.com`."""
     parsed_url = urllib.parse.urlparse(url, "https")
     normalized_url = parsed_url
     if not parsed_url.netloc and parsed_url.path:
