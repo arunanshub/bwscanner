@@ -1,3 +1,6 @@
+# version file
+src/**/_version.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -50,7 +53,6 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-.ruff_cache/
 
 # Translations
 *.mo
@@ -71,7 +73,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-
+docs/site
 # PyBuilder
 target/
 
@@ -106,7 +108,7 @@ celerybeat.pid
 .env
 .venv
 env/
-venv/
+/venv/
 ENV/
 env.bak/
 venv.bak/
@@ -128,3 +130,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+caches/
+.idea/
+__pypackages__
+.pdm.toml
+.pdm-python
+temp.py
+
+# Pyannotate generated stubs
+type_info.json
+.pdm-build/
+src/pdm/VERSION

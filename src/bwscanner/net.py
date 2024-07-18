@@ -15,7 +15,7 @@ class SiteInfo:
 
 
 HEADERS_BYPASS_BLOCK = {
-    "User-Agent": r"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"  # noqa: E501
+    "User-Agent": r"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     r"(KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.100.0",
     "Referer": "https://google.com/",
     "Accept-Encoding": "gzip, deflate, br",
@@ -30,6 +30,7 @@ REGEX_REMOVE_HTML_COMMENTS = re.compile(r"(?=<!--)([\s\S]*?)-->", re.MULTILINE)
 async def get_response(
     session: aiohttp.ClientSession,
     site: str,
+    *,
     remove_comments: bool = False,
     allow_redirects: bool = True,
 ) -> SiteInfo | None:

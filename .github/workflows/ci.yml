@@ -17,18 +17,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4.1
+        with:
+          cache: true
 
       - name: Install Python
         uses: actions/setup-python@v5
         id: setup-python
         with:
           python-version: ">=3.8"
-          cache: poetry
 
       - name: Install dependencies
-        run: poetry install
+        run: pdm install
 
       - name: Cache Pre-Commit Dependencies
         uses: actions/cache@v4
@@ -38,8 +39,7 @@ jobs:
 
       - name: Lint with Mypy and Flake8
         run: |
-          poetry run pre-commit run --all mypy
-          poetry run pre-commit run --all ruff
+          pdm run pre-commit run --all
 
   build:
     needs: [lint]
@@ -53,23 +53,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Poetry
-        run: |
-          pipx install poetry
-          poetry config virtualenvs.in-project true
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4.1
+        with:
+          cache: true
 
       - name: Install Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: poetry
 
       - name: Install Dependencies
-        run: poetry install --no-interaction
+        run: pdm install
 
       # TODO: add testing steps
       - name: Test with Pytest
-        run: poetry run pytest -n auto --dist=worksteal --cov=src/ --cov-report=lcov --cov-branch
+        run: pdm run pytest -n auto --dist=worksteal --cov=src/ --cov-report=lcov --cov-branch
 
       - name: Upload Coverage Report
         uses: coverallsapp/github-action@v2.3.0
@@ -95,12 +94,8 @@ jobs:
       - name: Get 2nd-last commit tag
         id: second-last
         run: |
-          tags="$(git tag --sort=creatordate)"
-          output=''
-          # length > 1 means we have multiple tags and we need 2nd last one
-          if [[ "$(echo "$tags" | grep -c ^)" != "1" ]]; then
-            output="$(echo "$tags" | tail -2 | head -1)"
-          fi
+          tags=$(git tag --sort=creatordate)
+          output=$(echo "$tags" | sed -n 'x;$p')
           echo "tag=$output" >> $GITHUB_OUTPUT
 
       - name: Generate Changelog
@@ -117,17 +112,21 @@ jobs:
           tag_name: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Poetry
-        run: pipx install poetry
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4.1
+        with:
+          cache: true
 
       - name: Set Up Python
         uses: actions/setup-python@v5
         with:
           python-version: ">=3.8"
-          cache: "poetry"
 
       - name: Publish Package
-        run: poetry publish --build -u __token__
+        run: pdm publish
+        env:
+          PDM_PUBLISH_USERNAME: __token__
+          PDM_PUBLISH_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
 
   finish:
     needs: [build]
