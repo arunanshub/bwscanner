@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import bwscanner.utils
 from hypothesis import given
+
+import bwscanner.utils
 
 from .utils import raw_url
 
