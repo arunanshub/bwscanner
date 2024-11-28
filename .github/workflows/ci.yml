@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup PDM
-        uses: pdm-project/setup-pdm@v4.1
+        uses: pdm-project/setup-pdm@v4.2
         with:
           cache: true
 
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup PDM
-        uses: pdm-project/setup-pdm@v4.1
+        uses: pdm-project/setup-pdm@v4.2
         with:
           cache: true
 
@@ -113,7 +113,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup PDM
-        uses: pdm-project/setup-pdm@v4.1
+        uses: pdm-project/setup-pdm@v4.2
         with:
           cache: true
 
